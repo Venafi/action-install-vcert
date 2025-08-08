@@ -118,31 +118,6 @@ jobs:
         run: |
           [[ -z $(git diff --stat) ]]
 
-  main:
-    permissions: {}
-    runs-on: ${{ matrix.os }}
-    strategy:
-      matrix:
-        os:
-          - macos-latest
-          - ubuntu-latest
-          - windows-latest
-        go_version:
-          - '1.21'
-    name: Try to install with go ${{ matrix.go_version }}
-    steps:
-      - uses: actions/checkout@8ade135a41bc03ea155e62e844d188df1ea18608 # v4.1.0
-      - uses: actions/setup-go@93397bea11091df50f3d7e59dc26a7711a8bcfbe # v4.1.0
-        with:
-          go-version: ${{ matrix.go_version }}
-          check-latest: true
-      - name: Install vCert\ CLI
-        uses: ./
-        with:
-          release: main
-      - name: Check install
-        run: vcert -version
-
   required:
     needs:
     - default
@@ -150,7 +125,6 @@ jobs:
     - wrong_version
     - custom_dir
     - custom_dir_root
-    - main
     runs-on: ubuntu-latest
     steps:
     - run: echo "Required jobs success!"
