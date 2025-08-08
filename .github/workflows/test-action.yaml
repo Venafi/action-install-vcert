@@ -19,7 +19,7 @@ jobs:
       - name: Install vCert CLI
         uses: ./
       - name: Check install
-        run: vcert version
+        run: vcert -version
       - name: Check root directory
         shell: bash
         run: |
@@ -43,7 +43,7 @@ jobs:
         with:
           release: 'v5.11.1'
       - name: Check install
-        run: vCert version
+        run: vcert -version
       - name: Check root directory
         shell: bash
         run: |
@@ -83,7 +83,7 @@ jobs:
         with:
           install-dir: "$HOME/.vcerttest"
       - name: Check install
-        run: vcert version
+        run: vcert -version
       - name: Check install dir
         shell: bash
         run: |
@@ -108,7 +108,7 @@ jobs:
           install-dir: /usr/bin
           use-sudo: true
       - name: Check install
-        run: vcert version
+        run: vcert -version
       - name: Check install dir
         shell: bash
         run: |
@@ -141,7 +141,7 @@ jobs:
         with:
           release: main
       - name: Check install
-        run: vcert version
+        run: vcert -version
 
   required:
     needs:
