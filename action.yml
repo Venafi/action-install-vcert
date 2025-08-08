@@ -124,30 +124,15 @@ runs:
         case ${{ runner.os }} in
           Linux)
             $SUDO unzip ${release_archive}
-            case ${{ runner.arch }} in
-              ARM64)
-                mv vcert_arm vcert
-                ;;
-
-              *)
-                log_error "unsupported architecture ${{ runner.arch }}"
-                exit 1
-                ;;
-            esac
+            if [[ ${{ runner.arch }} == 'ARM64' ]]; then
+              mv vcert_arm vcert
+            fi
             ;;
-
           macOS)
             $SUDO unzip ${release_archive}
-            case ${{ runner.arch }} in
-              ARM64)
-                mv vcert_arm vcert
-                ;;
-
-              *)
-                log_error "unsupported architecture ${{ runner.arch }}"
-                exit 1
-                ;;
-            esac
+            if [[ ${{ runner.arch }} == 'ARM64' ]]; then
+              mv vcert_arm vcert
+            fi
             ;;
           Windows)
             $SUDO unzip ${release_archive}
