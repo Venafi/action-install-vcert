@@ -48,7 +48,7 @@ jobs:
     name: Install vCert CLI
     steps:
       - name: Install vCert CLI
-        uses: venafi/action-install-cli@v0.2.0
+        uses: venafi/action-install-cli@v0.1.0
       - name: Check install
         run: vcert -version
 ```
