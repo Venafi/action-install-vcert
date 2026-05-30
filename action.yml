@@ -27,6 +27,10 @@ runs:
   using: composite
   steps:
     - shell: bash
+      env:
+        RELEASE: ${{ inputs.release }}
+        INSTALL_DIR: ${{ inputs.install-dir }}
+        USE_SUDO: ${{ inputs.use-sudo }}
       run: |
         #!/bin/bash
 
@@ -42,11 +46,19 @@ runs:
 
         set -e
 
-        mkdir -p ${{ inputs.install-dir }}
+        semver='^v([0-9]+\.){0,2}(\*|[0-9]+)(-?r?c?)(\.[0-9]+)$'
+        if [[ "$RELEASE" =~ $semver ]]; then
+          log_info "Custom version '$RELEASE' requested"
+        else
+          log_error "Unable to validate requested version: '$RELEASE'"
+          exit 1
+        fi
+
+        mkdir -p "$INSTALL_DIR"
 
         trap "popd >/dev/null" EXIT
 
-        pushd ${{ inputs.install-dir }} > /dev/null
+        pushd "$INSTALL_DIR" > /dev/null
 
         case ${{ runner.os }} in
           Linux)
@@ -103,22 +115,14 @@ runs:
         esac
 
         SUDO=
-        if [[ "${{ inputs.use-sudo }}" == "true" ]] && command -v sudo >/dev/null; then
+        if [[ "$USE_SUDO" == "true" ]] && command -v sudo >/dev/null; then
           SUDO=sudo
         fi
 
-        semver='^v([0-9]+\.){0,2}(\*|[0-9]+)(-?r?c?)(\.[0-9]+)$'
-        if [[ ${{ inputs.release }} =~ $semver ]]; then
-          log_info "Custom version '${{ inputs.release }}' requested"
-        else
-          log_error "Unable to validate requested version: '${{ inputs.release }}'"
-          exit 1
-        fi
+        release_archive=vcert_${RELEASE}_${release_archive}
+        release_archive_url=https://github.com/Venafi/vcert/releases/download/${RELEASE}/${release_archive}
 
-        release_archive=vcert_${{ inputs.release }}_${release_archive}
-        release_archive_url=https://github.com/Venafi/vcert/releases/download/${{ inputs.release }}/${release_archive}
-
-        log_info "Downloading vCert CLI version '${{ inputs.release }}'...\n      ${release_archive_url}"
+        log_info "Downloading vCert CLI version '$RELEASE'...\n      ${release_archive_url}"
         $SUDO curl -sL ${release_archive_url} -o ${release_archive}
 
         case ${{ runner.os }} in
@@ -150,8 +154,12 @@ runs:
         log_info "Installation complete!"
 
     - if: ${{ runner.os == 'Linux' || runner.os == 'macOS' }}
-      run: echo "${{ inputs.install-dir }}" >> $GITHUB_PATH
+      env:
+        INSTALL_DIR: ${{ inputs.install-dir }}
+      run: echo "$INSTALL_DIR" >> $GITHUB_PATH
       shell: bash
     - if: ${{ runner.os == 'Windows' }}
-      run: echo "${{ inputs.install-dir }}" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
+      env:
+        INSTALL_DIR: ${{ inputs.install-dir }}
+      run: echo "$env:INSTALL_DIR" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
       shell: pwsh
