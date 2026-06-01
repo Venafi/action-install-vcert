@@ -1,3 +1,5 @@
+As of June 1, 2026 this project is deprecated and will no longer be maintained.
+
 # action-install-vcert
 
 This action enables you to install vCert CLI.
